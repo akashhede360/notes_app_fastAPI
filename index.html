@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes App CRUD</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0; padding: 0;
+}
+h1 { margin-top: 20px; color: #333; }
+.container {
+  width: 90%; max-width: 600px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 20px; border-radius: 10px; margin-top: 20px;
+}
+input, textarea {
+  width: 100%; padding: 10px; margin-top: 10px;
+  border-radius: 6px; border: 1px solid #ccc;
+}
+button {
+  margin-top: 10px; background-color: #007bff; color: white;
+  border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;
+}
+button:hover { background-color: #0056b3; }
+.note {
+  background: linear-gradient(120deg, #fdf6e3 60%, #fbc2eb 100%);
+  border-left: 6px solid #a18cd1;
+  padding: 18px 16px 14px 18px; margin-top: 18px; border-radius: 12px; position: relative;
+  box-shadow: 0 2px 12px #fbc2eb22;
+  transition: box-shadow 0.2s;
+}
+.note button {
+  position: absolute; top: 5px; right: 5px;
+  background: red; color: white; border: none; border-radius: 5px;
+  cursor: pointer; padding: 2px 6px;
+}
+.note button:hover { background: darkred; }
+.note .datetime { font-size: 12px; color: #666; margin-top: 5px; }
+.note p { margin: 0; }
+</style>
+</head>
+<body>
+<h1>🗒️ Notes CRUD App</h1>
+<div class="container">
+  <input type="text" id="writerInput" placeholder="Enter your name" />
+  <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+  <button id="addNoteBtn">Add Note</button>
+  <div id="notesList"></div>
+</div>
+
+<script>
+const API_URL = "http://127.0.0.1:8000/api/notes/";
+
+const writerInput = document.getElementById("writerInput");
+const noteInput = document.getElementById("noteInput");
+const addNoteBtn = document.getElementById("addNoteBtn");
+const notesList = document.getElementById("notesList");
+
+// Fetch all notes from backend
+async function fetchNotes() {
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  displayNotes(data);
+}
+
+// Add a new note
+async function addNote() {
+  const writer = writerInput.value.trim();
+  const text = noteInput.value.trim();
+  if (!writer || !text) {
+    alert("Please enter name and note.");
+    return;
+  }
+  const noteData = { writer, text };
+  await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(noteData)
+  });
+  writerInput.value = "";
+  noteInput.value = "";
+  fetchNotes();
+}
+
+// Delete note
+async function deleteNote(id) {
+  await fetch(`${API_URL}${id}/`, { method: "DELETE" });
+  fetchNotes();
+}
+
+// Display notes in UI
+function displayNotes(notes) {
+  notesList.innerHTML = "";
+  notes.forEach(note => {
+    const date = new Date(note.created_at).toLocaleString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: true
+    });
+    const noteDiv = document.createElement("div");
+    noteDiv.className = "note";
+    noteDiv.innerHTML = `
+      <p><strong>${note.writer}:</strong> ${note.text}</p>
+      <div class="datetime">🕒 ${date}</div>
+      <button onclick="deleteNote(${note.id})">X</button>
+    `;
+    notesList.appendChild(noteDiv);
+  });
+}
+
+addNoteBtn.addEventListener("click", addNote);
+fetchNotes();
+</script>
+</body>
+</html>
