@@ -22,7 +22,7 @@ app.add_middleware(
 
 # ----------------- Serve React Frontend -----------------
 # Point this to the folder where your React build files exist
-FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "frontend_build")
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "build")
 
 if os.path.exists(FRONTEND_DIR):
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
@@ -96,3 +96,4 @@ def delete_note(note_id: int):
     db.commit()
     db.close()
     return {"message": "Note deleted successfully"}
+
