@@ -1,8 +1,8 @@
 FROM node:20-alpine AS frontend-build
 WORKDIR /frontend
-COPY Front-end/package*.json ./
+COPY package*.json ./
 RUN npm install
-COPY Front-end/ ./
+COPY . .
 RUN npm run build
 
 FROM python:3.10-alpine AS production
@@ -22,3 +22,4 @@ COPY --from=frontend-build /frontend/dist /app/Front-end
 WORKDIR /app/Back-end
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
