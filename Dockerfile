@@ -13,13 +13,10 @@ WORKDIR /app
 RUN apk add --no-cache build-base libffi-dev openssl-dev musl-dev linux-headers \
  && apk add --no-cache --virtual .fetch-deps curl
 
-COPY Back-end/requirements.txt /app/Back-end/requirements.txt
-RUN pip install --no-cache-dir -r /app/Back-end/requirements.txt
-
-COPY Back-end/ /app/Back-end
-COPY --from=frontend-build /frontend/dist /app/Front-end
-
-WORKDIR /app/Back-end
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+WORKDIR /app
+COPY .  .
+COPY --from=frontend-build /frontend/dist /app/frontend
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-
