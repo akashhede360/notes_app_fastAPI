@@ -5,6 +5,9 @@ from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
 
 # ----------------- FastAPI Setup -----------------
 app = FastAPI(title="Notes CRUD API")
@@ -16,6 +19,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ----------------- Serve React Frontend -----------------
+# Point this to the folder where your React build files exist
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "frontend_build")
+
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+
+@app.get("/")
+def serve_frontend():
+    index_path = os.path.join(FRONTEND_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "Frontend not built or missing"}
 
 # ----------------- Database Setup -----------------
 DATABASE_URL = "sqlite:///./notes.db"
