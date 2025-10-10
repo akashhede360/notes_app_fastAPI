@@ -1,8 +1,22 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+# Notes App with FastAPI
+
+A simple notes application built with **FastAPI** and **Uvicorn**, with the frontend served via **Nginx**. Supports creating, reading, updating, and deleting notes, and can be easily deployed using **Docker**.
+
+## Features
+- CRUD operations for notes
+- FastAPI backend with Uvicorn
+- Nginx for serving static frontend
+- Dockerized for easy deployment
+
+## Installation
+
+Clone the repo:
+```bash
+git clone https://github.com/Akashhede/notes_app_fastAPI.git
+cd notes_app_fastAPI
+
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
