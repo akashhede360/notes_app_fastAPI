@@ -63,14 +63,19 @@ const noteInput = document.getElementById("noteInput");
 const addNoteBtn = document.getElementById("addNoteBtn");
 const notesList = document.getElementById("notesList");
 
-// Fetch all notes from backend
+// Fetch all notes
 async function fetchNotes() {
-  const res = await fetch(API_URL);
-  const data = await res.json();
-  displayNotes(data);
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    displayNotes(data);
+  } catch (err) {
+    console.error("Failed to fetch notes:", err);
+  }
 }
 
-// Add a new note
+// Add note
 async function addNote() {
   const writer = writerInput.value.trim();
   const text = noteInput.value.trim();
@@ -78,31 +83,48 @@ async function addNote() {
     alert("Please enter name and note.");
     return;
   }
-  const noteData = { writer, text };
-  await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(noteData)
-  });
-  writerInput.value = "";
-  noteInput.value = "";
-  fetchNotes();
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ writer, text })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    writerInput.value = "";
+    noteInput.value = "";
+    fetchNotes();
+  } catch (err) {
+    console.error("Failed to add note:", err);
+    alert("Failed to add note. Check server.");
+  }
 }
 
 // Delete note
 async function deleteNote(id) {
-  await fetch(`${API_URL}${id}/`, { method: "DELETE" });
-  fetchNotes();
+  try {
+    const res = await fetch(`${API_URL}${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    fetchNotes();
+  } catch (err) {
+    console.error("Failed to delete note:", err);
+  }
 }
 
-// Display notes in UI
+// Display notes
 function displayNotes(notes) {
   notesList.innerHTML = "";
+  if (notes.length === 0) {
+    notesList.innerHTML = "<p>No notes found.</p>";
+    return;
+  }
+
   notes.forEach(note => {
-    const date = new Date(note.created_at).toLocaleString('en-IN', {
-      day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit', hour12: true
+    const date = new Date(note.created_at).toLocaleString("en-IN", {
+      day: "2-digit", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit", hour12: true
     });
+
     const noteDiv = document.createElement("div");
     noteDiv.className = "note";
     noteDiv.innerHTML = `
