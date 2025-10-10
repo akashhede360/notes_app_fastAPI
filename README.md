@@ -17,6 +17,11 @@ Clone the repo:
 git clone https://github.com/Akashhede/notes_app_fastAPI.git
 cd notes_app_fastAPI
 
+sudo apt install docker.io -y
 
+sudo usermod -aG docker $USER
+
+##RUN Docker command
 docker build -t notes_app .
 docker run -p 8000:8000 notes_app
+
